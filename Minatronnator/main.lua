@@ -21,13 +21,33 @@ local out_chest = side.top
 local width = 5
 local height = 5
 
-local function forward()
-	turtle.digDown()
-	turtle.forward()
-end
-
-while true do
-	for i = 1, width, 1 do
-		forward()
+local function forward(dis)
+	for i = 1, dis or 1 do
+		turtle.digDown()
+		turtle.forward()
 	end
 end
+
+---@param _side '"left"'|'"right"'
+local function half_turn(_side)
+	if _side == "left" then
+		turtle.turnLeft()
+		forward()
+		turtle.turnLeft()
+	end
+
+	if _side == "right" then
+		turtle.turnRight()
+		forward()
+		turtle.turnRight()
+	end
+end
+
+for i = 1, math.floor(width/2) do
+	forward(height)
+	half_turn("left")
+	forward(height)
+	half_turn("right")
+end
+turtle.down()
+turtle.digDown()
