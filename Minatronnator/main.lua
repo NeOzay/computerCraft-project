@@ -1,6 +1,5 @@
 local HOME = {
 	x = 0,
-	y = 0,
 	z = 0
 }
 
@@ -31,9 +30,40 @@ local function startCheck()
 	end
 end
 
+local function getPos()
+	local x, y, z = gps.locate()
+	return {x = x, y = y, z = z}
+end
+
+function getOrientation()
+	local loc1 = vector.new(gps.locate(2, false))
+	if not turtle.forward() then
+		for j=1,6 do
+			if not turtle.forward() then
+				turtle.dig()
+			else
+				break
+			end
+		end
+	end
+	local loc2 = vector.new(gps.locate(2, false))
+	local heading = loc2 - loc1
+	return ((heading.x + math.abs(heading.x) * 2) + (heading.z + math.abs(heading.z) * 3))
+end
+
+local function gotoStartPoint()
+	turtle.up()
+	local pos = getPos()
+	local disx = HOME.x - pos.x
+	local disz = HOME.z - pos.z
+
+
+end
+
 local function forward(dis)
 	for i = 2, dis or 2 do
 		turtle.digDown()
+		turtle.dig()
 		local ok, text = turtle.forward()
 		if not ok then
 			print(text)
@@ -44,7 +74,7 @@ local function forward(dis)
 	end
 end
 
----@param _side boolean
+---@param _side boolean @false right, true left
 local function half_turn(_side)
 	if _side then
 		turtle.turnLeft()
@@ -93,7 +123,6 @@ while true do
 	turtle.digDown()
 	turtle.turnRight()
 	turtle.down()
-	turtle.digDown()
 	refuel()
 	empty()
 end
