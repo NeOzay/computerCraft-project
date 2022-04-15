@@ -1,12 +1,12 @@
-xpos, zpos, ypos= -13, 70, 162
-sensducofre     = "south"
-cote            = 15
+local xpos, zpos, ypos= -13, 70, 162
+local sensducofre     = "south"
+local cote            = 15
+
+local cardinaux
 
 
 
-
-
-xi, zi, yi = gps.locate()
+local xi, zi, yi = gps.locate()
 
 if cote % 2 == 0 then
 
@@ -20,7 +20,6 @@ end
 function reloadfuel()
 
 	if (turtle.getFuelLevel() / turtle.getFuelLimit()) * 100 < 85 or turtle.getItemCount(14) ~= 0 then
-
 		while (turtle.getFuelLevel() / turtle.getFuelLimit()) * 100 < 85 do
 			turtle.select(16)
 			turtle.refuel(1)
@@ -29,14 +28,14 @@ function reloadfuel()
 			end
 		end
 		if turtle.getItemCount(16) == 0 or turtle.getItemCount(12) ~= 0 then
-			x, z, y = gps.locate()
+			local x, z, y = gps.locate()
 			for valeur3 = 0, math.abs(zpos - z) - 1 do --fait monter la turtle--
 				turtle.up()
 			end
 			turtle.select(16)
 			turtle.suckUp(turtle.getItemSpace(16))
 
-			nrslot = 1
+			local nrslot = 1
 			for valeur5 = 0, 14 do --vide la turtle--
 				turtle.select(nrslot)
 				turtle.drop()
@@ -55,7 +54,7 @@ function reloadfuel()
 end
 
 function positioncardinaux()
-	x, z, y = gps.locate()
+	local x, z, y = gps.locate()
 	if turtle.forward() == true then
 		x2, z2, y2 = gps.locate()
 
