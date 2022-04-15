@@ -61,9 +61,6 @@
 		"**/CVS": true,
 		"**/.DS_Store": true
 	},
-	"Lua.workspace.library": [
-		"C:/Users/colpa/Documents/Code_Informatique/LUA/Open Computer/Open Computer documentation"
-	],
 	"pixelbyte.love2d.runOnSave": false,
 	"Lua.hint.setType": true,
 	"Lua.workspace.checkThirdParty": false,

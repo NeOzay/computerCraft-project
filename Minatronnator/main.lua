@@ -1,15 +1,17 @@
-local HOME = {
-	x = -207,
-	z = -160
-}
+local HOME
 
-local side = {}
-side.top = "top"
-side.bottom = "bottom"
-side.left = "left"
-side.right = "right"
-side.front = "front"
-side.back = "back"
+if fs.exists("config.lua") then
+	local f = io.open("config.lua", "r")
+	HOME = textutils.unserialise(f:read("*a"))
+	print("load config")
+else
+	local x, _, z = gps.locate()
+	local text = textutils.serialise({x = x, z = z})
+	local f = io.open("config.lua", "w")
+	f:write(text)
+	print("save config")
+end
+
 
 local orientation = {}
 orientation[1] = "west"
@@ -202,8 +204,12 @@ local function main()
 		turtle.digDown()
 		turtle.down()
 		turtle.digDown()
-		turtle.down()
-		turtle.turnRight()
+		if not turtle.down() then
+			os.exit()	
+		end
+		turtle.turnRight() 
+			
+		
 		refuel()
 		empty()
 	end
