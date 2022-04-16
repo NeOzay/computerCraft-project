@@ -1,19 +1,21 @@
 ---@type {x:number, y:number}
 local HOME
 
-local width = 16
-local height = 16
+local width
+local height
 if fs.exists("config.lua") then
 	local f = io.open("config.lua", "r")
-	HOME = textutils.unserialise(f:read("*a"))
+	local data = textutils.unserialise(f:read("*a"))
+	HOME = data.HOME
+	width = data.width
+	height = data.height
 	print("load config")
 else
 	local x, _, z = gps.locate()
 	HOME = {x = x, z = z}
-	
 	width = 16
 	height = 16
-	local text = textutils.serialise(HOME)
+	local text = textutils.serialise({HOME = HOME, height = height, width = width})
 	local f = io.open("config.lua", "w")
 	f:write(text)
 	print("save config")
