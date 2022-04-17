@@ -1,4 +1,18 @@
----@type {x:number, y:number}
+local function getPos()
+	for i = 1, 3 do
+		print("get position...")
+		local x, y, z = gps.locate()
+		if x and y and z then
+			print("position found")
+			return x, y, z
+		end
+		os.sleep(2)
+	end
+	error("position not found")
+end
+
+
+---@type {x:number, z:number}
 local HOME
 
 local width
@@ -11,10 +25,10 @@ if fs.exists("config.lua") then
 	height = data.height
 	print("load config")
 else
-	local x, _, z = gps.locate()
+	local x, _, z = getPos()
 	HOME = {x = x, z = z}
-	width = 16
-	height = 16
+	width = 15
+	height = 15
 	local text = textutils.serialise({HOME = HOME, height = height, width = width})
 	local f = io.open("config.lua", "w")
 	f:write(text)
@@ -59,20 +73,16 @@ local function forward(dis)
 	end
 end
 
-local function getPos()
-	local x, y, n = gps.locate()
-	return {x = x, y = y, z = z}
-end
 
 function getOrientation()
-	local loc1 = vector.new(gps.locate())
+	local loc1 = vector.new(getPos)
 	local loc2
 	if turtle.forward() then
-		loc2 = vector.new(gps.locate())
+		loc2 = vector.new(getPos())
 		turtle.back()
 	elseif turtle.back() then
 		loc2 = loc1
-		loc1 = vector.new(gps.locate())
+		loc1 = vector.new(getPos())
 		turtle.forward()
 	end
 
@@ -133,9 +143,9 @@ end
 
 local function gotoStartPoint()
 
-	local pos = getPos()
-	local disx = HOME.x - pos.x
-	local disz = HOME.z - pos.z
+	local posx, _, posz = getPos()
+	local disx = HOME.x - posx
+	local disz = HOME.z - posz
 	if disx == 0 and disz == 0 then
 		return
 	end
@@ -201,7 +211,7 @@ local function main()
 	positionnementZ(-1)
 	while true do
 		sideflip = false
-		for i = 1, width - 1 do
+		for i = 1, width do
 			forward(height)
 			half_turn(sideflip)
 			sideflip = not sideflip
