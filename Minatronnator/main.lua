@@ -11,7 +11,6 @@ local function getPos()
 	error("position not found")
 end
 
-
 ---@type {x:number, z:number}
 local HOME
 
@@ -32,6 +31,7 @@ else
 	local text = textutils.serialise({HOME = HOME, height = height, width = width})
 	local f = io.open("config.lua", "w")
 	f:write(text)
+	f:close()
 	print("save config")
 end   
 

@@ -2,7 +2,7 @@
 ---@class rs
 _G.rs = { }
 --- Returns the sides available for redstone.
----@return table
+---@return {[1]:"bottom", [2]:"top", [3]:"back", [4]:"front", [5]:"right", [6]:"left"}
 function rs.getSides() end
 
 --- Returns the digital value of the redstone on a side.

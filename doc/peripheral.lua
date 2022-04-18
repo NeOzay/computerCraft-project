@@ -1,3 +1,5 @@
+---@alias sidesList "bottom"|"top"|"back"|"front"|"right"|"left"
+
 --- Interacts with peripherals.
 ---@class peripheral
 _G.peripheral = { }
@@ -29,7 +31,7 @@ function peripheral.getName(peripheral) end
 function peripheral.call(side, method, ...) end
 
 --- Returns a table containing all of the methods of a peripheral.
----@param side string @ The side to check
+---@param side sidesList @ The side to check
 ---@return table/nil
 function peripheral.wrap(side) end
 
