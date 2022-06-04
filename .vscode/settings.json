@@ -67,5 +67,9 @@
 	"Lua.semantic.annotation": true,
 	"Lua.semantic.keyword": true,
 	"Lua.semantic.variable": true,
-	"vscode-lua-format.configPath": ".vscode/lua-format.txt"
+	"vscode-lua-format.configPath": ".vscode/lua-format.txt",
+	"Lua.diagnostics.disable": [
+		"lowercase-global",
+		"need-check-nil"
+	]
 }
