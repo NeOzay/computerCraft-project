@@ -8,6 +8,7 @@ local drawerSide = "down"
 local monitor = peripheral.wrap("top")
 monitor.clear()
 monitor.setTextScale(0.5)
+
 ---@return Item[]
 local function selectRecipe()
 	local i = 0
@@ -30,25 +31,25 @@ end
 ---@param recipe Item[]
 local function findItems(recipe)
 	local itemsSlot = {} ---@type table<string, number>
-	local toFound = {} ---@type {[string]:boolean}
+	local toFound = {} ---@type {[string]:Item}
+
 	for _, item in ipairs(recipe) do
-		toFound[item.name] = true
+		toFound[item.name..item.damage] = item
 	end
 
-	for i = 1, drawer.size() do
-		local item = drawer.getItemMeta(i)
-		if item and  toFound[item.displayName] then
-			toFound[item.displayName] = nil
-			itemsSlot[item.displayName] = i
+	for index, item in pairs(drawer.list()) do
+		if item and  toFound[item.name..item.damage] then
+			itemsSlot[toFound[item.name..item.damage].displayName] = index
+			toFound[item.name..item.damage] = nil
 		end
 	end
 
 	local missing = {}
 	local hasmissing = false
-	for name, bool in pairs(toFound) do
-		if bool then
+	for name, item in pairs(toFound) do
+		if item then
 			hasmissing = true
-			table.insert(missing, name)
+			table.insert(missing, item.displayName)
 		end
 	end
 	if hasmissing then
@@ -93,9 +94,9 @@ local item_to_transfer = {} ---@type table<number,number>
 local stringDecal = 0
 
 for index, item in ipairs(selectedRecipe) do
-	stringDecal = math.max(stringDecal, #item.name)
-	write(1, index, item.name)
-	item_to_transfer[index] = recipeAmount * item.n
+	stringDecal = math.max(stringDecal, #item.displayName)
+	write(1, index, item.displayName)
+	item_to_transfer[index] = recipeAmount * item.count
 end
 
 ---@generic K,V
@@ -150,7 +151,7 @@ end
 
 local function main()
 	for index, item, itemAmount in loop(selectedRecipe, item_to_transfer) do
-		local itemStoredSlot = itemsSlot[item.name]
+		local itemStoredSlot = itemsSlot[item.displayName]
 		local transfered = transferToAssembler(itemStoredSlot, index, itemAmount)
 		item_to_transfer[index] = itemAmount - transfered
 		display(index, itemStoredSlot, item_to_transfer[index])
