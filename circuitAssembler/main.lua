@@ -4,7 +4,7 @@ local recipes = require("recipes")
 local drawer = peripheral.wrap("storagedrawers:controller_3")
 local assembler = peripheral.wrap("right")
 local drawerSide = "down"
-
+---@type monitor
 local monitor = peripheral.wrap("top")
 monitor.clear()
 monitor.setTextScale(0.5)

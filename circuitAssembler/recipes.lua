@@ -1,3 +1,1 @@
-local recipes = {}
-
-return recipes
+return {}

@@ -4,17 +4,17 @@
 ---@class peripheral
 _G.peripheral = { }
 --- Checks if a peripheral is present on a side.
----@param side string @ The side to check
+---@param side sidesList @ The side to check
 ---@return boolean
 function peripheral.isPresent(side) end
 
 --- Returns the type of peripheral on a side.
----@param side string|table @ The side or wrapped peripheral to check
+---@param side sidesList|table @ The side or wrapped peripheral to check
 ---@return string|nil
 function peripheral.getType(side) end
 
 --- Returns a list of methods that the peripheral has.
----@param side string @ The side to check
+---@param side sidesList @ The side to check
 ---@return table|nil
 function peripheral.getMethods(side) end
 
@@ -42,6 +42,6 @@ function peripheral.wrap(side) end
 function peripheral.find(type, fnFilter) end
 
 --- Returns a list of names of connected peripherals.
----@return table
+---@return string[]
 function peripheral.getNames() end
 
