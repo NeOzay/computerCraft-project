@@ -18,8 +18,6 @@ local file = io.open("recipes", "w")
 file:write("return "..textutils.serialise(recipes))
 file:close()
 
----@class Item
----@field name string
----@field damage number
----@field count number
----@field displayName? string
+---@class recipe_Item:list_Item
+---@field displayName string
+

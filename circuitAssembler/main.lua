@@ -1,19 +1,17 @@
+local recipes = require("recipes") ---@type table<string, recipe_Item[]>
 
-local recipes = require("recipes")
-
-local drawer = peripheral.wrap("storagedrawers:controller_3")
-local assembler = peripheral.wrap("right")
+local drawer = peripheral.wrap("storagedrawers:controller_3") ---@type generic_inventory
+local assembler = peripheral.wrap("right") ---@type generic_inventory
 local drawerSide = "down"
----@type monitor
-local monitor = peripheral.wrap("top")
+local monitor = peripheral.wrap("top") ---@type monitor
 monitor.clear()
 monitor.setTextScale(0.5)
 
----@return Item[]
+---@return recipe_Item[]
 local function selectRecipe()
 	local i = 0
 	local text = ""
-	local list = {} ---@type Item[][]
+	local list = {} ---@type recipe_Item[][]
 	for name, recipe in pairs(recipes) do
 		i = i + 1
 		text = text.."["..i.."]"..name..","
@@ -28,25 +26,27 @@ local function selectRecipe()
 	return list[selection]
 end
 
----@param recipe Item[]
+---@param recipe recipe_Item[]
 local function findItems(recipe)
 	local itemsSlot = {} ---@type table<string, number>
-	local toFound = {} ---@type {[string]:Item}
+	local toFound = {} ---@type table<string, recipe_Item>
 
 	for _, item in ipairs(recipe) do
 		toFound[item.name..item.damage] = item
 	end
 
 	for index, item in pairs(drawer.list()) do
-		if item and  toFound[item.name..item.damage] then
-			itemsSlot[toFound[item.name..item.damage].displayName] = index
-			toFound[item.name..item.damage] = nil
+		local itembundle = item.name..item.damage
+		local found = toFound[itembundle]
+		if found then
+			itemsSlot[found.displayName] = index
+			toFound[itembundle] = nil
 		end
 	end
 
 	local missing = {}
 	local hasmissing = false
-	for name, item in pairs(toFound) do
+	for _, item in pairs(toFound) do
 		if item then
 			hasmissing = true
 			table.insert(missing, item.displayName)
@@ -77,27 +77,20 @@ local function selectAmount()
 	return amount
 end
 
+---@param x number
+---@param y number
+---@param text any
 local function write(x, y, text)
 	monitor.setCursorPos(x, y)
 	monitor.write(tostring(text))
 end
 
----@return Item[]
+---@return recipe_Item[]
 ---@return number
 local function request()
 	return selectRecipe(), selectAmount()
 end
 
-local selectedRecipe, recipeAmount = request()
-local itemsSlot = findItems(selectedRecipe)
-local item_to_transfer = {} ---@type table<number,number>
-local stringDecal = 0
-
-for index, item in ipairs(selectedRecipe) do
-	stringDecal = math.max(stringDecal, #item.displayName)
-	write(1, index, item.displayName)
-	item_to_transfer[index] = recipeAmount * item.count
-end
 
 ---@generic K,V
 ---@param t table<K,V>
@@ -117,19 +110,19 @@ end
 ---@generic K,V:integer
 ---@param t table<K,V>
 ---@param index K
----@param key V?
+---@param value V?
 ---@return K
 ---@return V
-local function check0(t, index, key)
-	if key and key == 0 then
+local function check0(t, index, value)
+	if value and value == 0 then
 		t[index] = nil
-		index, key = getNext(t, index)
-		return check0(t, index, key)
+		index, value = getNext(t, index)
+		return check0(t, index, value)
 	end
-	return index, key
+	return index, value
 end
 
----@param recipe Item[]
+---@param recipe recipe_Item[]
 ---@param t2 table<number,number>
 local function loop(recipe, t2)
 	---@param itemAmount table<number,number>
@@ -142,19 +135,33 @@ local function loop(recipe, t2)
 	end, t2
 end
 
-
-local function display(index, slot, amount)
+---@param index number
+---@param slot number
+---@param amount number
+---@param offset number
+local function display(index, slot, amount, offset)
 		local storedItem = drawer.getItemMeta(slot)
-		write(stringDecal + 4, index, string.format("%.4d", amount))
-		write(stringDecal + 10, index, string.format("%.5d", storedItem and storedItem.count or 0))
+		write(offset + 4, index, string.format("%.4d", amount))
+		write(offset + 10, index, string.format("%.5d", storedItem and storedItem.count or 0))
 end
 
 local function main()
+	local selectedRecipe, recipeAmount = request()
+	local itemsSlot = findItems(selectedRecipe)
+	local item_to_transfer = {} ---@type table<number,number>
+	local offset = 0
+
+	for index, item in ipairs(selectedRecipe) do
+		offset = math.max(offset, #item.displayName)
+		write(1, index, item.displayName)
+		item_to_transfer[index] = recipeAmount * item.count
+	end
+
 	for index, item, itemAmount in loop(selectedRecipe, item_to_transfer) do
 		local itemStoredSlot = itemsSlot[item.displayName]
 		local transfered = transferToAssembler(itemStoredSlot, index, itemAmount)
 		item_to_transfer[index] = itemAmount - transfered
-		display(index, itemStoredSlot, item_to_transfer[index])
+		display(index, itemStoredSlot, item_to_transfer[index], offset)
 	end
 end
 
